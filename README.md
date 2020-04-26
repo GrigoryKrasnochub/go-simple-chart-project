@@ -10,7 +10,7 @@ This block was written primarily for me, because I needed to have this informati
 <h3> Windows </h3>
 Just set up in root directory <a href="https://www.msys2.org/">https://www.msys2.org/</a> (necessary for fyne dependency)
 <br><br>
-After that clone repo to your and do (init params throw "set")
+After that clone repo to your and do (init params throw "set")<br>
 -with console<br>
 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v
 <br><br>
