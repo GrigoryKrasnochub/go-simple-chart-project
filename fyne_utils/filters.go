@@ -20,7 +20,7 @@ func NumericInDiapason(input *string,from float64, to float64, defaultValue floa
 
 	if number < from || number > to {
 		number = defaultValue
-		resultError = errors.New("number beyond the borders")
+		resultError = errors.New(fmt.Sprintf("number beyond the borders. should be between %.2f and %.2f",from, to))
 	}
 
 	*input = fmt.Sprint(number)
