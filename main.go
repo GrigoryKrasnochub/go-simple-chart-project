@@ -85,7 +85,7 @@ func main() {
 	resultQualitySumContainer := widget.NewHBox(resultQualitySumLabel, resultQualitySum)
 
 	resultContainer := widget.NewVBox(
-		widget.NewLabel("Результаты"),
+		widget.NewLabel("Results"),
 		resultSpentResourceContainer,
 		resultResource1Container,
 		resultResource2Container,
