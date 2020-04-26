@@ -10,6 +10,7 @@ import (
 	"github.com/GrigoryKrasnochub/go-simple-chart-project/calc/poledata"
 	"github.com/GrigoryKrasnochub/go-simple-chart-project/charts"
 	"github.com/GrigoryKrasnochub/go-simple-chart-project/fyne_utils"
+	"image"
 	"log"
 	"strconv"
 
@@ -119,6 +120,7 @@ func main() {
 	operationType := widget.NewSelect([]string{calc2.Maximize.String(), calc2.Minimize.String()}, func(value string) {
 		if settings, found := applicationConstantsMap[value]; found {
 			resultSpentResourceLabel.Text = settings.resultSpentResourceLabel
+			resultSpentResourceLabel.Text = settings.resultSpentResourceLabel
 			resultResource1Label.Text = settings.resultResource1Label
 			resultResource2Label.Text = settings.resultResource2Label
 			resultQuality1Label.Text = settings.resultQuality1Label
@@ -132,10 +134,10 @@ func main() {
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
-			{"Операция", operationType},
-			{"Номер варианта", variantNumber},
-			{"Шаг", calculationStep},
-			{"Максимальное значение изменяемого параметра", resourceVolume},
+			{"Operation", operationType},
+			{"Variant", variantNumber},
+			{"Step", calculationStep},
+			{"Max size", resourceVolume},
 		},
 		OnSubmit: func() {
 			type inputFieldsKeeper struct {
@@ -173,7 +175,7 @@ func main() {
 				calc := calc2.Calc{
 					VariantNumber:  variant,
 					Step:           step,
-					Type:			calc2.Type(operationType.Selected),
+					Type:           calc2.Type(operationType.Selected),
 					ResourceVolume: volume,
 					CalcStep: []calc2.CalculationStep{
 						{
@@ -187,19 +189,14 @@ func main() {
 				}
 
 				log.Println("Form onSubmitClick finish start another goroutine ")
-				go func() {
+
+				resultChanel := make(chan calc2.CalculationStep, 1)
+				poleChanel := make(chan image.Image, 1)
+				go func(resultChanel chan calc2.CalculationStep, poleChanel chan image.Image) {
 					calc.DoCalc()
 					log.Println("Finish Calculation")
 					log.Println(calc.CalcStep)
-
-					lastCalcStep := calc.CalcStep[len(calc.CalcStep)-1]
-					resultSpentResource.Text = fmt.Sprint(lastCalcStep.SpentResource)
-					resultResource1.Text = fmt.Sprint(lastCalcStep.Resource1)
-					resultResource2.Text = fmt.Sprint(lastCalcStep.Resource2)
-					resultQuality1.Text = fmt.Sprint(lastCalcStep.Quality1)
-					resultQuality2.Text = fmt.Sprint(lastCalcStep.Quality2)
-					resultQualitySum.Text = fmt.Sprint(lastCalcStep.Quality1 + lastCalcStep.Quality2)
-					resultContainer.Refresh()
+					resultChanel <- calc.CalcStep[len(calc.CalcStep)-1]
 
 					res := imgCanvas.Image
 					res = charts.GetChartFromPoleData([]poledata.PoleData{
@@ -207,10 +204,22 @@ func main() {
 						poledata.GetResource2ToSpentResourceGraph(calc.CalcStep, applicationConstantsMap[operationType.Selected].resultResource2Label),
 						poledata.GetSumQualityToSpentResourceGraph(calc.CalcStep, applicationConstantsMap[operationType.Selected].resultQualitySumLabel),
 					}, applicationConstantsMap[operationType.Selected].resultSpentResourceLabel, fmt.Sprintf("%s %s %s", applicationConstantsMap[operationType.Selected].resultResource1Label, applicationConstantsMap[operationType.Selected].resultResource2Label, applicationConstantsMap[operationType.Selected].resultQualitySumLabel))
-					imgCanvas.Image = res
-					imgCanvas.Refresh()
+					poleChanel <- res
 					log.Println("Form onSubmitClick  another goroutine finish")
-				}()
+				}(resultChanel, poleChanel)
+
+				lastCalcStep := <-resultChanel
+				resultSpentResource.Text = fmt.Sprint(lastCalcStep.SpentResource)
+				resultResource1.Text = fmt.Sprint(lastCalcStep.Resource1)
+				resultResource2.Text = fmt.Sprint(lastCalcStep.Resource2)
+				resultQuality1.Text = fmt.Sprint(lastCalcStep.Quality1)
+				resultQuality2.Text = fmt.Sprint(lastCalcStep.Quality2)
+				resultQualitySum.Text = fmt.Sprint(lastCalcStep.Quality1 + lastCalcStep.Quality2)
+				resultContainer.Refresh()
+
+				poleRes := <-poleChanel
+				imgCanvas.Image = poleRes
+				imgCanvas.Refresh()
 				log.Println("Form onSubmitClick main finish")
 			}
 		},
