@@ -1,6 +1,6 @@
 package poledata
 
-import calc2 "github.com/GrigoryKrasnochub/go-simple-chart-project/calc"
+import _calc "github.com/GrigoryKrasnochub/go-simple-chart-project/calc"
 
 type PoleData struct {
 	Name    string
@@ -8,8 +8,8 @@ type PoleData struct {
 	PointsY []float64
 }
 
-func GetResource1ToSpentResourceGraph(calcStep []calc2.CalculationStep, Resource1Label string) PoleData {
-	var C1 []float64
+func GetResource1ToSpentResourceGraph(calcStep []_calc.CalculationStep, Resource1Label string) PoleData {
+	C1 := make([]float64, 0, len(calcStep))
 	var SpentResource []float64
 	for _, step := range calcStep {
 		C1 = append(C1, step.Resource1)
@@ -23,8 +23,8 @@ func GetResource1ToSpentResourceGraph(calcStep []calc2.CalculationStep, Resource
 	}
 }
 
-func GetResource2ToSpentResourceGraph(calcStep []calc2.CalculationStep, Resource2Label string) PoleData {
-	var C2 []float64
+func GetResource2ToSpentResourceGraph(calcStep []_calc.CalculationStep, Resource2Label string) PoleData {
+	C2 := make([]float64, 0, len(calcStep))
 	var SpentResource []float64
 	for _, step := range calcStep {
 		C2 = append(C2, step.Resource2)
@@ -38,7 +38,7 @@ func GetResource2ToSpentResourceGraph(calcStep []calc2.CalculationStep, Resource
 	}
 }
 
-func GetSumQualityToSpentResourceGraph(calcStep []calc2.CalculationStep, SumQualityLabel string) PoleData {
+func GetSumQualityToSpentResourceGraph(calcStep []_calc.CalculationStep, SumQualityLabel string) PoleData {
 	var RecyclingQuality []float64
 	var SpentResource []float64
 	for _, step := range calcStep {
