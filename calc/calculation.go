@@ -122,18 +122,10 @@ func (calc *Calc) minimize() {
 	}
 }
 
-func (calc *Calc) calcT1Derivative(L1 float64) float64 {
-	return 1/math.Pow((-L1+ 1+1/ float64(calc.VariantNumber)),2)
-}
-
-func (calc *Calc) calcT2Derivative(L2 float64) float64 {
-	return 1/math.Pow(3-L2,2)
-}
-
 func (calc *Calc) calcT1(L1 float64) float64 {
-	return 1/((1+1/float64(calc.VariantNumber))- L1)
+	return 1 / ((1 + 1/float64(calc.VariantNumber)) - L1)
 }
 
 func (calc *Calc) calcT2(L2 float64) float64 {
-	return 1/(3- L2)
+	return 1 / (3 - L2)
 }
